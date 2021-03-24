@@ -7,23 +7,23 @@ HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR})
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 
-ADD_EXECUTABLE(step-1 source/step-1.cc)
-DEAL_II_SETUP_TARGET(step-1)
+# Executable
+FILE(GLOB executable_files source/*cc)
+ADD_EXECUTABLE(step-3 ${executable_files})
+DEAL_II_SETUP_TARGET(step-3)
 
-ADD_EXECUTABLE(step-2 source/step-2.cc)
-DEAL_II_SETUP_TARGET(step-2)
+# Library of the executable
+ADD_LIBRARY(step-3-lib SHARED $<TARGET_OBJECTS:step-3>)
+DEAL_II_SETUP_TARGET(step-3-lib)
 
-ADD_LIBRARY(step-1-lib SHARED $<TARGET_OBJECTS:step-1>)
-DEAL_II_SETUP_TARGET(step-1-lib)
-
-ADD_LIBRARY(step-2-lib SHARED $<TARGET_OBJECTS:step-2>)
-DEAL_II_SETUP_TARGET(step-2-lib)
-
+# Tester executable
 FIND_PACKAGE(GTest)
-ADD_EXECUTABLE(gtest source/gtest.cc)
-TARGET_LINK_LIBRARIES(gtest ${GTEST_LIBRARY} step-1-lib step-2-lib)   
-INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
+FILE(GLOB test_files tests/*cc)
+ADD_EXECUTABLE(gtest ${test_files})
+TARGET_LINK_LIBRARIES(gtest ${GTEST_LIBRARY} step-3-lib)   
 DEAL_II_SETUP_TARGET(gtest)
+
+INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS} ./include/)
 
 ENABLE_TESTING()
 GTEST_DISCOVER_TESTS(gtest)
