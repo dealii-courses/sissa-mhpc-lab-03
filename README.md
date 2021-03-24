@@ -5,7 +5,7 @@
 
 * * * * *
 
-### Instructions
+## General Instructions
 
 For each of the point below, extend the `step-3` class with functions that 
 perform the indicated tasks, trying to minimize the amount of code you copy
@@ -24,22 +24,26 @@ TEST_F(Step3Tester, Exercise3) {
 }
 ```
 
-By the end of this laboratory, you will have a code that solves a Poisson problem
-in two dimensions, on different domain types, with arbitrary right hand side,
-arbitrary Dirichlet boundary conditions, variable finite element degree, and
-different levels of refinement.
+By the end of this laboratory, you will have a code that solves a Poisson 
+problem in two dimensions, on different domain types, with arbitrary right hand
+side, arbitrary Dirichlet boundary conditions, variable finite element degree, 
+and different levels of refinement.
 
 The program will read parameter files for its execution. This is the minimal 
 starting point for simple but extensible Finite Element applications, and 
 touches already many important and fundamental characteristics of general and 
 extensible Finite Element codes.
 
-### Lab-03: step-3 and ParameterHandler
+## Lab-03 
+
+### step-3
 
 1.  See documentation of step-3 at
     <https://www.dealii.org/current/doxygen/deal.II/step_3.html>
 
-2.  Compile and run step-3.
+2.  Compile and run step-3. Examine the source and header files. Move all 
+    `#include<...>` directives that you can from the header `step-3.h` to
+    the source file `step-3.cc`.
 
 3.  Open the vtk output and visualize the solution in paraview or visit. 
     Figure out how to warp the solution by the solution variable. Save a picture
@@ -75,12 +79,12 @@ extensible Finite Element codes.
 
 ### ParameterHandler
 
-1.  Follow the documentation of the class `ParameterAcceptor` (from "A typical 
-    usage of this class"). Derive your `Step3` class from `ParameterAcceptor`, 
-    and add a function that initializes the class given a parameter
-    file name, i.e., `initialize("parameters.prm")`, by calling 
+1.  Follow the documentation of the class `ParameterAcceptor` 
+    (from "A typical usage of this class"). Derive your `Step3` class from 
+    `ParameterAcceptor`, and initialize the `ParameterAcceptor` class using 
+    the string `"Step3"`. Add a function that initializes the class given a 
+    parameter file name, i.e., `initialize("parameters.prm")`, by calling 
     `ParameterAcceptor::initialize(...)`
-    
     
 2.  Add the following parameters to your `Step3` class, and make sure they 
     are used throughout your code
@@ -89,8 +93,10 @@ extensible Finite Element codes.
       - Number of global refinements
       - Output filename
 
-    Make sure that the degree of the quadrature formula you use is adequate 
-    w.r.t. to the degree of the finite element (i.e., at least `fe.degree+1`).
+    Notice that the `FE_Q` class will need to be built *after* the 
+    initialization of the Finite element degree variable. You can create
+    it right before you use it, and then reference to it by 
+    `DoFHandler::get_fe()` when you need it later.
 
 3.  Add two `FunctionParser<2>` members to your `Step3` class, one for the 
     boundary conditions, and one for the forcing term. Add two `std::string` 
@@ -119,4 +125,38 @@ extensible Finite Element codes.
     (running the test through the `gtest` application), and create a 
     visualization for each of the given parameters, with the same
     name of the parameter file, i.e., the visualization of the test that runs
-    `parameters/hyper-shell.prm` should be saved on an image named `figures/hyper-shell.png`. Commits all your generated figures.
+    `parameters/hyper_shell.prm` should be saved on an image named `figures/hyper_shell.png`. Commits all your generated figures.
+    Notice that for older versions of google test, you may need to run each
+    test individually (this is a known issue between google testsuite and the
+    `ParameterAcceptor` class). To run an individual test, you can use the 
+    `--gtest_filter` command line option, i.e., the following command
+
+    ```
+    ./gtest --gtest_filter=Step3Tester.HyperShell
+    ```
+
+    will run only the test `Step3Tester.HyperShell`.
+
+    If you want to run all tests one after the other you can call the `ctest` 
+    utility, which will execute the `gtest` command passing the gtest filter for
+    each of the tests you provided, producing, for example, an output similar 
+    to:
+
+    ```
+    dealii@66c3be678611:/workspace/sissa-mhpc-lab-03/build-container$ ctest
+    Test project /workspace/sissa-mhpc-lab-03/build-container
+        Start 1: Step3Tester.MakeGrid
+    1/6 Test #1: Step3Tester.MakeGrid .............   Passed    0.68 sec
+        Start 2: Step3Tester.HyperCube
+    2/6 Test #2: Step3Tester.HyperCube ............   Passed    0.78 sec
+        Start 3: Step3Tester.HyperShell
+    3/6 Test #3: Step3Tester.HyperShell ...........   Passed    1.90 sec
+        Start 4: Step3Tester.HyperBall
+    4/6 Test #4: Step3Tester.HyperBall ............   Passed    1.28 sec
+        Start 5: Step3Tester.SinRhs
+    5/6 Test #5: Step3Tester.SinRhs ...............   Passed    0.79 sec
+        Start 6: Step3Tester.SinBc
+    6/6 Test #6: Step3Tester.SinBc ................   Passed    1.26 sec
+    
+    100% tests passed, 0 tests failed out of 6
+    ```
