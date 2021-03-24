@@ -24,6 +24,16 @@ TEST_F(Step3Tester, Exercise3) {
 }
 ```
 
+By the end of this laboratory, you will have a code that solves a Poisson problem
+in two dimensions, on different domain types, with arbitrary right hand side,
+arbitrary Dirichlet boundary conditions, variable finite element degree, and
+different levels of refinement.
+
+The program will read parameter files for its execution. This is the minimal 
+starting point for simple but extensible Finite Element applications, and 
+touches already many important and fundamental characteristics of general and 
+extensible Finite Element codes.
+
 ### Lab-03: step-3 and ParameterHandler
 
 1.  See documentation of step-3 at
